@@ -12,6 +12,8 @@ const PORT = 3000;
 async function bootstrap() {
    //builds the entire app by reading modules/controllers/providers
   const app = await NestFactory.create(AppModule);
+  // sets the global prefix for all routes
+  app.setGlobalPrefix('api/v1'); 
   //starts the HTTP server
   await app.listen(PORT);
   console.log(`Server is running on port ${PORT}`);
