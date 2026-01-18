@@ -1,0 +1,10 @@
+// other modules can import DatabaseModule and then inject DatabaseService
+
+import { Module } from '@nestjs/common';
+import { DatabaseService } from './database.service';
+
+@Module({
+  providers: [DatabaseService],
+  exports: [DatabaseService],
+})
+export class DatabaseModule {}
