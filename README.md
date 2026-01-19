@@ -2,69 +2,102 @@
 
 A simple backend API built with **NestJS**, **TypeScript**, **PostgreSQL**, and **Docker**.
 
-This project demonstrates a clean backend architecture with:
-- Feature-based structure (Games)
-- PostgreSQL database running in Docker
-- Automatic database initialization with seed data
-- Simple REST API
+This project is intentionally educational and demonstrates clean backend architecture, proper API behavior, validation, and database access using plain SQL.
+
+---
+
+## Tech Stack
+
+- Node.js + TypeScript
+- NestJS
+- PostgreSQL (Dockerized)
+- pg (no ORM)
+- class-validator / class-transformer
+- Docker Compose
 
 ---
 
 ## Features
 
-- TypeScript + NestJS backend
-- PostgreSQL database (Dockerized)
-- Automatic DB schema + seed on first run
-- REST API with JSON responses
-- Example endpoint: `GET /games`
+- REST API with proper HTTP semantics
+- API versioning (`/api/v1`)
+- DTO-based validation
+- Graceful error handling
+- PostgreSQL with automatic schema + seed
+- One-command startup for new developers
 
 ---
 
 ## Prerequisites
 
-Make sure you have the following installed:
+Make sure you have installed:
 
-- **Node.js** (LTS recommended)
-- **npm**
-- **Docker** + **Docker Compose**
+- Node.js (LTS)
+- npm
+- Docker + Docker Compose
 
-No global Nest CLI is required.
+No global Nest CLI required.
 
 ---
 
 ## Getting Started (One Command)
 
-Clone the repository and run:
+### 1️⃣ Clone the repository
+```bash
+git clone <your-repo-url>
+cd nest-games
+```
 
+### 2️⃣ Create environment file
+```bash
+cp .env.example .env
+```
+
+### 3️⃣ Run the app
 ```bash
 npm run dev
 ```
 
-This single command will:
-
+This command will:
 1. Start PostgreSQL using Docker
-2. Automatically create the database schema
-3. Seed the database with example games
-4. Start the NestJS application
+2. Automatically create DB schema + seed data (first run only)
+3. Start the NestJS API
 
-The application will be available at:
-
+The API will be available at:
 ```
 http://localhost:3000
 ```
 
 ---
 
-## API
+## Environment Variables
+
+The app requires the following environment variable:
+
+```env
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/games_db
+```
+
+See `.env.example` for reference.
+
+---
+
+## API Base URL
+
+```
+/api/v1
+```
+
+---
+
+## API Endpoints
 
 ### Get all games
-
-**Request**
 ```
-GET /games
+GET /api/v1/games
 ```
 
-**Response**
+**200 OK**
 ```json
 [
   {
@@ -72,38 +105,105 @@ GET /games
     "title": "Hades",
     "genre": "Roguelike",
     "price": 1999,
-    "created_at": "2026-01-18T10:00:00.000Z",
-    "updated_at": "2026-01-18T10:00:00.000Z"
-  },
-  {
-    "id": "uuid",
-    "title": "Stardew Valley",
-    "genre": "Farming",
-    "price": 1499,
-    "created_at": "2026-01-18T10:00:00.000Z",
-    "updated_at": "2026-01-18T10:00:00.000Z"
+    "created_at": "...",
+    "updated_at": "..."
   }
 ]
 ```
 
 ---
 
+### Get game by id
+```
+GET /api/v1/games/:id
+```
+
+- 200 OK → game found  
+- 404 Not Found → game does not exist
+
+---
+
+### Create a game
+```
+POST /api/v1/games
+```
+
+**Request body**
+```json
+{
+  "title": "Celeste",
+  "genre": "Platformer",
+  "price": 1999
+}
+```
+
+**201 Created**
+```json
+{
+  "id": "uuid",
+  "title": "Celeste",
+  "genre": "Platformer",
+  "price": 1999,
+  "created_at": "...",
+  "updated_at": "..."
+}
+```
+
+Validation errors return **400 Bad Request**.
+
+---
+
+### Update a game (partial)
+```
+PATCH /api/v1/games/:id
+```
+
+**Request body**
+```json
+{
+  "price": 2499
+}
+```
+
+Responses:
+- 200 OK → updated game
+- 400 Bad Request → empty or invalid body
+- 404 Not Found → game does not exist
+
+---
+
+### Delete a game
+```
+DELETE /api/v1/games/:id
+```
+
+**200 OK**
+```json
+{
+  "message": "Game removed successfully"
+}
+```
+
+404 if the game does not exist.
+
+---
+
 ## Database
 
-The database is PostgreSQL and runs inside Docker.
-
-### Configuration
-- **Database name:** `games_db`
-- **Username:** `postgres`
-- **Password:** `postgres`
-- **Port:** `5432`
+- PostgreSQL runs in Docker
+- Database: `games_db`
+- User / Password: `postgres / postgres`
+- Port: `5432`
 
 ### Initialization
-On the **first run only**, Docker automatically:
+On the first run only, Docker automatically:
 - Creates the `games` table
-- Inserts two example games
+- Inserts example games
 
-This is handled by an SQL script mounted into the Postgres container.
+This is handled by:
+```
+docker/init.sql
+```
 
 ---
 
@@ -111,20 +211,26 @@ This is handled by an SQL script mounted into the Postgres container.
 
 ```
 src/
-  main.ts                # Application entry point
-  app.module.ts          # Root module
-  database/              # Database connection layer
+  main.ts                  # App bootstrap & global config
+  app.module.ts            # Root module
+
+  database/
     database.module.ts
     database.service.ts
-  games/                 # Games feature
-    games.module.ts
+
+  games/
+    dto/
+      create-game.dto.ts
+      update-game.dto.ts
     games.controller.ts
     games.service.ts
+    games.module.ts
 
 docker/
-  init.sql               # DB schema + seed data
+  init.sql
 
-docker-compose.yml       # Postgres container setup
+docker-compose.yml
+.env.example
 ```
 
 ---
@@ -132,37 +238,40 @@ docker-compose.yml       # Postgres container setup
 ## Scripts
 
 ```bash
-npm run dev     # Start database + app
-npm run start   # Start NestJS app only
+npm run dev     # Start DB + API
+npm run start   # Start API only
 ```
 
 ---
 
 ## Stopping the App
 
-Stop containers:
 ```bash
 docker compose down
 ```
 
-Reset database (delete all data):
+Reset database completely:
 ```bash
 docker compose down -v
 ```
 
 ---
 
-## Notes
+## Architecture Principles
 
-- This project is intentionally simple and educational
-- No ORM is used — database access is done with plain SQL via `pg`
-- Designed for beginners learning backend fundamentals
+- Controllers handle HTTP only
+- DTOs validate input shape
+- Services handle business logic
+- Database access is isolated
+- Validation happens before controllers
 
 ---
 
-## Planned Next Steps
+## Next Possible Improvements
 
-- GET /games/:id
-- POST /games
-- DELETE /games/:id
-- Validation & error handling
+- Authentication
+- Pagination
+- Soft deletes
+- Tests
+- Swagger / OpenAPI
+- Logging middleware

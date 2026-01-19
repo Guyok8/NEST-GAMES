@@ -87,6 +87,27 @@ export class GamesService {
     }
   
     return result.rows[0];
+  }
+  // PUT - replace a game information by id
+  async replace(id: string, dto: CreateGameDto) {
+    const result = await this.db.query(
+      `
+      UPDATE games
+      SET title = $1,
+          genre = $2,
+          price = $3,
+          updated_at = NOW()
+      WHERE id = $4
+      RETURNING id, title, genre, price, created_at, updated_at
+      `,
+      [dto.title, dto.genre, dto.price, id],
+    );
+  
+    if (result.rows.length === 0) {
+      throw new NotFoundException('Game not found');
+    }
+  
+    return result.rows[0];
   }  
 }
 

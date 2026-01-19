@@ -1,5 +1,5 @@
 // games.controller.ts
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
@@ -35,5 +35,11 @@ async create(@Body() dto: CreateGameDto) {
   @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateGameDto) { // calls the service to update a game by id
     return this.gamesService.update(id, dto); // returns the updated game
-  }  
+  }
+
+  // PUT - replace all game information by id
+  @Put(':id')
+  async replace(@Param('id') id: string, @Body() dto: CreateGameDto) {
+    return this.gamesService.replace(id, dto);
+  }
 }
