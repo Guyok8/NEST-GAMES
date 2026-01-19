@@ -15,30 +15,34 @@ export class GamesService {
     return result.rows;
   }
 
-  // GET a game by id
-  async findOne(id: string) {
-    const result = await this.db.query(
-      'SELECT id, title, genre, price, created_at, updated_at FROM games WHERE id = $1',
-      [id],
-    );
-    return result.rows[0];
+// GET a game by id
+async findOne(id: string) {
+  const result = await this.db.query(
+    'SELECT id, title, genre, price, created_at, updated_at FROM games WHERE id = $1',
+    [id],
+  );
+
+  if (result.rows.length === 0) {
+    throw new NotFoundException('Game not found');
   }
+
+  return result.rows[0];
+}
 
   // delete a game by id
   async remove(id: string) {
     const result = await this.db.query(
-      'DELETE FROM games WHERE id = $1 RETURNING id',
+      'DELETE FROM games WHERE id = $1',
       [id],
     );
   
-    if (result.rows.length === 0) {
-      throw new NotFoundException('Game ID not found');
+    if (result.rowCount === 0) {
+      throw new NotFoundException('Game not found');
     }
   
-    // If we got here, delete succeeded
-    return;
+    return { message: 'Game removed successfully' };
   }
-
+  
   // Ceate a new game
   async create(dto: CreateGameDto) {
     const result = await this.db.query(

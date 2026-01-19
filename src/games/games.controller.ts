@@ -5,7 +5,6 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 
 
-
 @Controller('games') // routes to this controller
 export class GamesController {
   constructor(private readonly gamesService: GamesService) {} // injects GamesService

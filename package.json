@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "docker compose up -d && npm install && npm run start",
-    "start": "ts-node src/main.ts"
+    "start": "ts-node src/main.ts",
+    "test": "jest",
+   "test:watch": "jest --watch"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -18,8 +20,13 @@
     "rxjs": "^7.8.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "@types/pg": "^8.10.0",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
   }
