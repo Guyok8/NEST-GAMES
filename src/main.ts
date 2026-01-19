@@ -1,20 +1,27 @@
-// Loads environment variables from .env file
 import 'dotenv/config';
-// Loads decorator metadata
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 const PORT = 3000;
 
-
-// Starts the HTTP server
 async function bootstrap() {
-   //builds the entire app by reading modules/controllers/providers
+  // creates the app instance
   const app = await NestFactory.create(AppModule);
+
   // sets the global prefix for all routes
-  app.setGlobalPrefix('api/v1'); 
-  //starts the HTTP server
+  app.setGlobalPrefix('api/v1');
+
+  // validates the data received from the client
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
   await app.listen(PORT);
   console.log(`Server is running on port ${PORT}`);
 }
