@@ -16,6 +16,12 @@ export class GamesController {
     return this.gamesService.findAll(); // returns the games
   }
 
+  // GET a game by id
+  @Get(':id')
+  async findOne(@Param('id') id: string) { // calls the service to get a game by id
+    return this.gamesService.findOne(id); // returns the game
+  }
+
 // delete a game by id
   @Delete(':id') 
   async remove(@Param('id') id: string) { // calls the service to delete a game by id

@@ -15,6 +15,15 @@ export class GamesService {
     return result.rows;
   }
 
+  // GET a game by id
+  async findOne(id: string) {
+    const result = await this.db.query(
+      'SELECT id, title, genre, price, created_at, updated_at FROM games WHERE id = $1',
+      [id],
+    );
+    return result.rows[0];
+  }
+
   // delete a game by id
   async remove(id: string) {
     const result = await this.db.query(
