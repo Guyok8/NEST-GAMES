@@ -21,7 +21,7 @@ export class GamesController {
     return this.gamesService.findOne(id); // returns the game
   }
 
-// delete a game by id
+// // delete a game by id
   @Delete(':id') 
   async remove(@Param('id') id: string) { // calls the service to delete a game by id
     await this.gamesService.remove(id); // returns the deleted game
@@ -30,7 +30,7 @@ export class GamesController {
       message: 'Game removed successfully', // returns the message
     };
   }
-// create a new game boundary test temporarily
+// // create a new game boundary test temporarily
 @Post()
 async create(@Body() dto: CreateGameDto) {
   return this.gamesService.create(dto);
